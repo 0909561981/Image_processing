@@ -60,9 +60,9 @@ class Window(QMainWindow, Ui_MainWindow):
 
     @pyqtSlot()
     def on_openAct_triggered(self):
-        # imgPath = "./data/13.jpg"
-        imgPath = QFileDialog.getOpenFileName(
-            self, "请选择图片", "/", "All Files (*)")[0]
+        imgPath = r"C:\Users\USER\Documents\GitHub\Image_processing\data\1.bmp"
+        #imgPath = QFileDialog.getOpenFileName(
+        #    self, "请选择图片", "/", "All Files (*)")[0]
         self.openImage(imgPath)
 
     def openImage(self, imgPath):
