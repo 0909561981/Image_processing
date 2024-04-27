@@ -9,7 +9,7 @@ from PyQt5.QtCore import QObject, pyqtSignal
 
 class LIME(QObject):
 
-    setMaximumSignal = pyqtSignal(float)
+    setMaximumSignal = pyqtSignal(int)
     setValueSignal = pyqtSignal(int)
 
     def __init__(self, img, alpha=1, gamma=0.7, rho=2):
