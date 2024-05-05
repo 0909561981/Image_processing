@@ -133,6 +133,7 @@ class LIME(QObject):
         self.R = rescale_intensity(self.R, (0, 1))
         self.R = img_as_ubyte(self.R)
         return self.R
+    # 這裡沒有用到self.t，不會被參數影響...
     def HE_enhance(self):
         gray_image = rgb2gray(self.L)
         enhanced_gray_image = equalize_hist(gray_image)

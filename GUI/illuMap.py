@@ -13,12 +13,12 @@ class IlluMapWindow(QWidget, Ui_Form):
         self.layout = QHBoxLayout(self.groupBox)
         self.layout.addWidget(self.figure)
 
-        self.colorMap = {'红黄': 'OrRd_r',
+        self.colorMap = {'紅黃': 'OrRd_r',
                          '灰色': 'Greys',
-                         '红粉': 'RdPu',
-                         '蓝绿': 'GnBu',
-                         '黄绿蓝': 'YlGnBu',
-                         '粉蓝': 'PuBu'}
+                         '紅粉': 'RdPu',
+                         '藍綠': 'GnBu',
+                         '黃綠藍': 'YlGnBu',
+                         '粉藍': 'PuBu'}
 
 
 if __name__ == '__main__':

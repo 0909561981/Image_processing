@@ -188,6 +188,7 @@ class Ui_MainWindow(object):
         self.menu_2.addAction(self.settingAct)
         self.menu_3.addAction(self.aboutAct)
         self.menu_4.addAction(self.enhanceAct)
+        self.menu_4.addAction(self.HEAction)
         self.menu_4.addAction(self.illuMapAct)
         self.menu_4.addSeparator()
         self.menu_8.addAction(self.showToolBarAct)
