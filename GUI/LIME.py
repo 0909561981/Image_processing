@@ -5,7 +5,9 @@ from skimage import img_as_ubyte, img_as_float
 from skimage.exposure import rescale_intensity
 
 from PyQt5.QtCore import QObject, pyqtSignal
-
+from skimage.exposure import equalize_hist
+from skimage.exposure import rescale_intensity
+from skimage.color import rgb2gray
 
 class LIME(QObject):
 
@@ -131,3 +133,14 @@ class LIME(QObject):
         self.R = rescale_intensity(self.R, (0, 1))
         self.R = img_as_ubyte(self.R)
         return self.R
+    def HE_enhance(self):
+        gray_image = rgb2gray(self.L)
+        enhanced_gray_image = equalize_hist(gray_image)
+        self.R = np.zeros(self.L.shape)
+        for i in range(3):
+            nonzero_mask = gray_image != 0
+            self.R[:, :, i] = np.where(nonzero_mask, self.L[:, :, i] * enhanced_gray_image / np.where(nonzero_mask, gray_image, 1), self.L[:, :, i])
+        self.R = rescale_intensity(self.R, (0, 1))
+        self.R = img_as_ubyte(self.R)
+        return self.R
+    
