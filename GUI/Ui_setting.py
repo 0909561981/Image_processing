@@ -123,9 +123,9 @@ class Ui_Form(object):
 
     def retranslateUi(self, Form):
         _translate = QtCore.QCoreApplication.translate
-        Form.setWindowTitle(_translate("Form", "参数设置"))
+        Form.setWindowTitle(_translate("Form", "參數設置"))
         self.label.setText(_translate("Form", "平滑度"))
         self.label_2.setText(_translate("Form", "亮度"))
         self.label_3.setText(_translate("Form", "降噪度"))
-        self.confirmBtn.setText(_translate("Form", "确认"))
+        self.confirmBtn.setText(_translate("Form", "確認"))
         self.cancelBtn.setText(_translate("Form", "取消"))

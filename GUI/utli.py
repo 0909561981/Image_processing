@@ -31,3 +31,21 @@ class WorkThread(QThread):
         T = self.lime.optimizeIllumMap()
         R = self.lime.enhance()
         self.finishSignal.emit(T, R)
+
+class HE(QThread):
+
+    finishSignal = pyqtSignal(ndarray, ndarray)
+
+    def __init__(self, imgPath, progressBar, alpha, gamma):
+        super(HE, self).__init__()
+
+        from LIME import LIME
+        img = imread(imgPath)
+        self.lime = LIME(img, alpha, gamma)
+        self.lime.setMaximumSignal.connect(progressBar.setMaximum)
+        self.lime.setValueSignal.connect(progressBar.setValue)
+
+    def run(self):
+        T = self.lime.optimizeIllumMap()
+        R = self.lime.HE_enhance()
+        self.finishSignal.emit(T, R)
