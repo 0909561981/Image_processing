@@ -53,13 +53,13 @@ class Ui_Form(object):
 
     def retranslateUi(self, Form):
         _translate = QtCore.QCoreApplication.translate
-        Form.setWindowTitle(_translate("Form", "光照图"))
-        self.label.setText(_translate("Form", "光照图颜色调整"))
-        self.colorComboBox.setItemText(0, _translate("Form", "红黄"))
+        Form.setWindowTitle(_translate("Form", "光照圖"))
+        self.label.setText(_translate("Form", "光照圖顏色調整"))
+        self.colorComboBox.setItemText(0, _translate("Form", "紅黃"))
         self.colorComboBox.setItemText(1, _translate("Form", "灰色"))
-        self.colorComboBox.setItemText(2, _translate("Form", "红粉"))
-        self.colorComboBox.setItemText(3, _translate("Form", "蓝绿"))
-        self.colorComboBox.setItemText(4, _translate("Form", "黄绿蓝"))
-        self.colorComboBox.setItemText(5, _translate("Form", "粉蓝"))
-        self.confirmBtn.setText(_translate("Form", "确认"))
-        self.saveIlluMapBtn.setText(_translate("Form", "保存光照图"))
+        self.colorComboBox.setItemText(2, _translate("Form", "紅粉"))
+        self.colorComboBox.setItemText(3, _translate("Form", "藍綠"))
+        self.colorComboBox.setItemText(4, _translate("Form", "黃綠藍"))
+        self.colorComboBox.setItemText(5, _translate("Form", "粉藍"))
+        self.confirmBtn.setText(_translate("Form", "確認"))
+        self.saveIlluMapBtn.setText(_translate("Form", "保存光照圖"))

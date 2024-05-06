@@ -9,8 +9,9 @@ from Ui_mainwindow import Ui_MainWindow
 from about import AboutWindow
 from illuMap import IlluMapWindow
 from setting import SettingWindow
-from utli import ImgFigure, WorkThread
+from utli import ImgFigure, WorkThread, HE
 
+import os
 
 class Window(QMainWindow, Ui_MainWindow):
     def __init__(self):
@@ -26,7 +27,7 @@ class Window(QMainWindow, Ui_MainWindow):
         self.originImgLayout.addWidget(self.originImgFigure)
         self.enhancedImgLayout.addWidget(self.enhancedImgFigure)
 
-        self.statusBar.showMessage("请选择文件")
+        self.statusBar.showMessage("請選擇文件")
         self.progressBar = QProgressBar()
         self.statusBar.addPermanentWidget(self.progressBar)
         # self.progressBar.setVisible(False)
@@ -62,8 +63,13 @@ class Window(QMainWindow, Ui_MainWindow):
     def on_openAct_triggered(self):
         imgPath = r"C:\Users\88696\Documents\GitHub\Image_processing\data\1.bmp"
         #imgPath = QFileDialog.getOpenFileName(
-        #    self, "请选择图片", "/", "All Files (*)")[0]
-        self.openImage(imgPath)
+        #    self, "請選擇圖片", "/", "All Files (*)")[0]
+        if imgPath:
+            if os.path.splitext(imgPath)[1].lower() == '.bmp' or os.path.splitext(imgPath)[1].lower() == '.jpg':
+                self.openImage(imgPath)
+            else:
+                QMessageBox.warning(self, "警告", "這不是BMP或是JPG的格式餒!!!")
+        
 
     def openImage(self, imgPath):
         self.imgPath = imgPath.strip()
@@ -71,13 +77,14 @@ class Window(QMainWindow, Ui_MainWindow):
             self.originImg = imread(self.imgPath)
             self.originImgFigure.axes.imshow(self.originImg)
             self.originImgFigure.draw()
-            self.statusBar.showMessage("当前图片路径: " + self.imgPath)
+            self.statusBar.showMessage("當前圖片路徑: " + self.imgPath)
 
             self.historyFile()
             self.progressBar.setValue(0)
             self.enhanceAct.setEnabled(True)
+            self.HEAction.setEnabled(True)
         else:
-            QMessageBox.warning(self, "提示", "请重新选择图片")
+            QMessageBox.warning(self, "提示", "請重新選擇圖片")
 
     def historyFile(self):
         with open("./resource/config/.history", 'r+') as fp:
@@ -101,10 +108,35 @@ class Window(QMainWindow, Ui_MainWindow):
         self.workThread.start()
         self.workThread.finishSignal.connect(self.on_workThread_finishSignal)
 
+    def on_HEAction_triggered(self):
+        self.progressBar.setValue(0)
+        # self.progressBar.setVisible(True)
+        self.HE = HE(
+            self.imgPath, self.progressBar, self.alpha, self.gamma)
+        self.HE.start()
+        self.HE.finishSignal.connect(self.on_HE_finishSignal)
+
     def on_workThread_finishSignal(self, T, R):
         self.T = T
         self.R = R
-        self.statusBar.showMessage("当前图片路径: " + self.imgPath + "   图像增强成功")
+        self.statusBar.showMessage("當前圖片路徑: " + self.imgPath + "   圖像增強成功")
+        # self.imgFigure.T_axes.imshow(self.T, )
+        self.enhancedImgFigure.axes.imshow(self.R)
+
+        self.progressBar.setValue(self.progressBar.maximum())
+        # self.progressBar.setVisible(False)
+
+        self.enhancedImgFigure.draw()
+        self.saveAct.setEnabled(True)
+        self.saveAsAct.setEnabled(True)
+        self.saveIlluMapAct.setEnabled(True)
+        self.denoiseAct.setEnabled(True)
+        self.illuMapAct.setEnabled(True)
+
+    def on_HE_finishSignal(self, T, R):
+        self.T = T
+        self.R = R
+        self.statusBar.showMessage("當前圖片路徑: " + self.imgPath + "   圖像增強成功")
         # self.imgFigure.T_axes.imshow(self.T, )
         self.enhancedImgFigure.axes.imshow(self.R)
 
@@ -121,12 +153,12 @@ class Window(QMainWindow, Ui_MainWindow):
     @pyqtSlot()
     def on_saveAsAct_triggered(self):
         savePath = QFileDialog.getSaveFileName(
-            self, "请选择保存位置", "/", "BMP格式 (*.bmp);;JPG格式 (*.jpg)")[0]
+            self, "請選擇保存位置", "/", "BMP格式 (*.bmp);;JPG格式 (*.jpg)")[0]
         if savePath != '':
             imsave(savePath, self.R)
             QMessageBox.about(self, "提示", "保存成功")
         else:
-            QMessageBox.warning(self, "提示", "请重新选择保存位置")
+            QMessageBox.warning(self, "提示", "請重新選擇保存位置")
 
     @pyqtSlot()
     def on_saveAct_triggered(self):
@@ -142,6 +174,7 @@ class Window(QMainWindow, Ui_MainWindow):
         self.enhancedImgFigure.draw()
 
         self.enhanceAct.setEnabled(False)
+        self.HEAction.setEnabled(False)
         self.saveIlluMapAct.setEnabled(False)
         self.saveAsAct.setEnabled(False)
         self.saveAct.setEnabled(False)
@@ -161,7 +194,7 @@ class Window(QMainWindow, Ui_MainWindow):
     @pyqtSlot()
     def on_saveIlluMapAct_triggered(self):
         savePath = QFileDialog.getSaveFileName(
-            self, "请选择保存位置", "/", "BMP格式 (*.bmp);;JPG格式 (*.jpg)")[0]
+            self, "請選擇保存位置", "/", "BMP格式 (*.bmp);;JPG格式 (*.jpg)")[0]
         if savePath != '':
             if self._illuMapWindowFlag == True:
                 color = self.illuMapWindow.colorComboBox.currentText()
@@ -171,7 +204,7 @@ class Window(QMainWindow, Ui_MainWindow):
                 imsave(savePath, self.T, cmap=get_cmap('OrRd_r'))
             QMessageBox.about(self, "提示", "保存成功")
         else:
-            QMessageBox.warning(self, "提示", "请重新选择保存位置")
+            QMessageBox.warning(self, "提示", "請重新選擇保存位置")
 
         # -------------其他界面-------------
 
