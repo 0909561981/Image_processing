@@ -3,7 +3,7 @@ from scipy.fft import fft, ifft
 from numpy.linalg import norm
 from skimage import img_as_ubyte, img_as_float
 from skimage.exposure import rescale_intensity
-
+import cv2
 from PyQt5.QtCore import QObject, pyqtSignal
 from skimage.exposure import equalize_hist
 from skimage.exposure import rescale_intensity
@@ -144,4 +144,57 @@ class LIME(QObject):
         self.R = rescale_intensity(self.R, (0, 1))
         self.R = img_as_ubyte(self.R)
         return self.R
-    
+
+    def HSI_enhance(self):
+        hsi_image = self.rgb_to_hsi(self.L)
+        hsi_image = img_as_float(hsi_image)
+        hsi_image[:, :, 2] = equalize_hist(hsi_image[:, :, 2])
+        enhanced_image = self.hsi_to_rgb(hsi_image)
+        enhanced_image = img_as_float(enhanced_image)
+        self.R = rescale_intensity(enhanced_image, in_range=(0, 1), out_range=np.uint8)
+        return self.R
+
+    def rgb_to_hsi(self, image):
+        with np.errstate(divide='ignore', invalid='ignore'):
+            image = image.astype('float32') / 255.0
+            r, g, b = cv2.split(image)
+            
+            i = (r + g + b) / 3.0
+
+            min_rgb = np.minimum(np.minimum(r, g), b)
+            s = 1 - 3 * min_rgb / (r + g + b + 1e-6)
+
+            h = np.arccos(0.5 * ((r - g) + (r - b)) / (np.sqrt((r - g) ** 2 + (r - b) * (g - b)) + 1e-6))
+            h[b > g] = 2 * np.pi - h[b > g]
+            h = h / (2 * np.pi)
+
+            return cv2.merge([h, s, i])
+
+    def hsi_to_rgb(self, hsi_image):
+        h, s, i = cv2.split(hsi_image)
+
+        h = h * 2 * np.pi
+
+        r = np.zeros_like(h)
+        g = np.zeros_like(h)
+        b = np.zeros_like(h)
+
+        mask_1 = (0 <= h) & (h < 2 * np.pi / 3)
+        mask_2 = (2 * np.pi / 3 <= h) & (h < 4 * np.pi / 3)
+        mask_3 = (4 * np.pi / 3 <= h) & (h < 2 * np.pi)
+
+        b[mask_1] = i[mask_1] * (1 - s[mask_1])
+        r[mask_1] = i[mask_1] * (1 + s[mask_1] * np.cos(h[mask_1]) / np.cos(np.pi / 3 - h[mask_1]))
+        g[mask_1] = 3 * i[mask_1] - (r[mask_1] + b[mask_1])
+
+        h[mask_2] -= 2 * np.pi / 3
+        r[mask_2] = i[mask_2] * (1 - s[mask_2])
+        g[mask_2] = i[mask_2] * (1 + s[mask_2] * np.cos(h[mask_2]) / np.cos(np.pi / 3 - h[mask_2]))
+        b[mask_2] = 3 * i[mask_2] - (r[mask_2] + g[mask_2])
+
+        h[mask_3] -= 4 * np.pi / 3
+        g[mask_3] = i[mask_3] * (1 - s[mask_3])
+        b[mask_3] = i[mask_3] * (1 + s[mask_3] * np.cos(h[mask_3]) / np.cos(np.pi / 3 - h[mask_3]))
+        r[mask_3] = 3 * i[mask_3] - (g[mask_3] + b[mask_3])
+
+        return np.clip(cv2.merge([r, g, b]) * 255, 0, 255).astype(np.uint8)

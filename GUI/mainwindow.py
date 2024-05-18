@@ -9,7 +9,7 @@ from Ui_mainwindow import Ui_MainWindow
 from about import AboutWindow
 from illuMap import IlluMapWindow
 from setting import SettingWindow
-from utli import ImgFigure, WorkThread, HE
+from utli import ImgFigure, WorkThread, HE, HSI
 
 import os
 
@@ -61,9 +61,9 @@ class Window(QMainWindow, Ui_MainWindow):
 
     @pyqtSlot()
     def on_openAct_triggered(self):
-        imgPath = r"C:\Users\USER\Documents\GitHub\Image_processing\data\1.bmp"
-        #imgPath = QFileDialog.getOpenFileName(
-        #    self, "請選擇圖片", "/", "All Files (*)")[0]
+        #imgPath = r"C:\Users\88696\Desktop\所有課程\三(下)\影像處理\1.jpg"
+        imgPath = QFileDialog.getOpenFileName(
+            self, "請選擇圖片", "/", "All Files (*)")[0]
         if imgPath:
             if os.path.splitext(imgPath)[1].lower() == '.bmp' or os.path.splitext(imgPath)[1].lower() == '.jpg':
                 self.openImage(imgPath)
@@ -83,6 +83,7 @@ class Window(QMainWindow, Ui_MainWindow):
             self.progressBar.setValue(0)
             self.enhanceAct.setEnabled(True)
             self.HEAction.setEnabled(True)
+            self.HSIAction.setEnabled(True)
         else:
             QMessageBox.warning(self, "提示", "請重新選擇圖片")
 
@@ -116,6 +117,14 @@ class Window(QMainWindow, Ui_MainWindow):
         self.HE.start()
         self.HE.finishSignal.connect(self.on_HE_finishSignal)
 
+    def on_HSIAction_triggered(self):
+        self.progressBar.setValue(0)
+        # self.progressBar.setVisible(True)
+        self.HSI = HSI(
+            self.imgPath, self.progressBar, self.alpha, self.gamma)
+        self.HSI.start()
+        self.HSI.finishSignal.connect(self.on_HSI_finishSignal)
+
     def on_workThread_finishSignal(self, T, R):
         self.T = T
         self.R = R
@@ -134,6 +143,23 @@ class Window(QMainWindow, Ui_MainWindow):
         self.illuMapAct.setEnabled(True)
 
     def on_HE_finishSignal(self, T, R):
+        self.T = T
+        self.R = R
+        self.statusBar.showMessage("當前圖片路徑: " + self.imgPath + "   圖像增強成功")
+        # self.imgFigure.T_axes.imshow(self.T, )
+        self.enhancedImgFigure.axes.imshow(self.R)
+
+        self.progressBar.setValue(self.progressBar.maximum())
+        # self.progressBar.setVisible(False)
+
+        self.enhancedImgFigure.draw()
+        self.saveAct.setEnabled(True)
+        self.saveAsAct.setEnabled(True)
+        self.saveIlluMapAct.setEnabled(True)
+        self.denoiseAct.setEnabled(True)
+        self.illuMapAct.setEnabled(True)
+    
+    def on_HSI_finishSignal(self, T, R):
         self.T = T
         self.R = R
         self.statusBar.showMessage("當前圖片路徑: " + self.imgPath + "   圖像增強成功")
@@ -175,6 +201,7 @@ class Window(QMainWindow, Ui_MainWindow):
 
         self.enhanceAct.setEnabled(False)
         self.HEAction.setEnabled(False)
+        self.HSIAction.setEnabled(False)
         self.saveIlluMapAct.setEnabled(False)
         self.saveAsAct.setEnabled(False)
         self.saveAct.setEnabled(False)
