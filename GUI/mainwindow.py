@@ -9,7 +9,7 @@ from Ui_mainwindow import Ui_MainWindow
 from about import AboutWindow
 from illuMap import IlluMapWindow
 from setting import SettingWindow
-from utli import ImgFigure, WorkThread, HE, HSI
+from utli import ImgFigure, WorkThread, HE, HSI, GC
 
 import os
 
@@ -84,6 +84,7 @@ class Window(QMainWindow, Ui_MainWindow):
             self.enhanceAct.setEnabled(True)
             self.HEAction.setEnabled(True)
             self.HSIAction.setEnabled(True)
+            self.GCAction.setEnabled(True)
         else:
             QMessageBox.warning(self, "提示", "請重新選擇圖片")
 
@@ -124,6 +125,14 @@ class Window(QMainWindow, Ui_MainWindow):
             self.imgPath, self.progressBar, self.alpha, self.gamma)
         self.HSI.start()
         self.HSI.finishSignal.connect(self.on_HSI_finishSignal)
+
+    def on_GCAction_triggered(self):
+        self.progressBar.setValue(0)
+        # self.progressBar.setVisible(True)
+        self.GC = GC(
+            self.imgPath, self.progressBar, self.alpha, self.gamma)
+        self.GC.start()
+        self.GC.finishSignal.connect(self.on_GC_finishSignal)
 
     def on_workThread_finishSignal(self, T, R):
         self.T = T
@@ -176,6 +185,23 @@ class Window(QMainWindow, Ui_MainWindow):
         self.denoiseAct.setEnabled(True)
         self.illuMapAct.setEnabled(True)
 
+    def on_GC_finishSignal(self, T, R):
+        self.T = T
+        self.R = R
+        self.statusBar.showMessage("當前圖片路徑: " + self.imgPath + "   圖像增強成功")
+        # self.imgFigure.T_axes.imshow(self.T, )
+        self.enhancedImgFigure.axes.imshow(self.R)
+
+        self.progressBar.setValue(self.progressBar.maximum())
+        # self.progressBar.setVisible(False)
+
+        self.enhancedImgFigure.draw()
+        self.saveAct.setEnabled(True)
+        self.saveAsAct.setEnabled(True)
+        self.saveIlluMapAct.setEnabled(True)
+        self.denoiseAct.setEnabled(True)
+        self.illuMapAct.setEnabled(True)
+
     @pyqtSlot()
     def on_saveAsAct_triggered(self):
         savePath = QFileDialog.getSaveFileName(
@@ -202,6 +228,7 @@ class Window(QMainWindow, Ui_MainWindow):
         self.enhanceAct.setEnabled(False)
         self.HEAction.setEnabled(False)
         self.HSIAction.setEnabled(False)
+        self.GCAction.setEnabled(False)
         self.saveIlluMapAct.setEnabled(False)
         self.saveAsAct.setEnabled(False)
         self.saveAct.setEnabled(False)

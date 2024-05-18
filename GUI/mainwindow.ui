@@ -17,7 +17,7 @@
    </size>
   </property>
   <property name="windowTitle">
-   <string>低光照图像增强系统</string>
+   <string>低光照圖像增強系統</string>
   </property>
   <property name="windowIcon">
    <iconset>
@@ -39,14 +39,14 @@
          <bool>true</bool>
         </property>
         <property name="title">
-         <string>原始图片</string>
+         <string>原始圖片</string>
         </property>
        </widget>
       </item>
       <item>
        <widget class="QGroupBox" name="enhancedBox">
         <property name="title">
-         <string>增强后图片</string>
+         <string>增強後圖片</string>
         </property>
        </widget>
       </item>
@@ -70,7 +70,7 @@
     </property>
     <widget class="QMenu" name="recentOpenMenu">
      <property name="title">
-      <string>最近打开</string>
+      <string>最近打開</string>
      </property>
      <property name="icon">
       <iconset>
@@ -90,20 +90,20 @@
    </widget>
    <widget class="QMenu" name="menu_2">
     <property name="title">
-     <string>设置</string>
+     <string>設置</string>
     </property>
     <addaction name="settingAct"/>
    </widget>
    <widget class="QMenu" name="menu_3">
     <property name="title">
-     <string>帮助</string>
+     <string>幫助</string>
     </property>
     <addaction name="aboutAct"/>
     <addaction name="thankAct"/>
    </widget>
    <widget class="QMenu" name="menu_4">
     <property name="title">
-     <string>增强</string>
+     <string>增強</string>
     </property>
     <addaction name="enhanceAct"/>
     <addaction name="illuMapAct"/>
@@ -111,7 +111,7 @@
    </widget>
    <widget class="QMenu" name="menu_8">
     <property name="title">
-     <string>视图</string>
+     <string>視圖</string>
     </property>
     <addaction name="showToolBarAct"/>
     <addaction name="showProgressBarAct"/>
@@ -163,7 +163,7 @@
      <normaloff>resource/image/open.png</normaloff>resource/image/open.png</iconset>
    </property>
    <property name="text">
-    <string>打开</string>
+    <string>打開</string>
    </property>
    <property name="font">
     <font>
@@ -196,7 +196,7 @@
      <normaloff>resource/image/setting.png</normaloff>resource/image/setting.png</iconset>
    </property>
    <property name="text">
-    <string>参数</string>
+    <string>參數</string>
    </property>
    <property name="font">
     <font>
@@ -210,7 +210,7 @@
      <normaloff>resource/image/undo.png</normaloff>resource/image/undo.png</iconset>
    </property>
    <property name="text">
-    <string>撤销</string>
+    <string>撤銷</string>
    </property>
   </action>
   <action name="redoAct">
@@ -234,10 +234,10 @@
      <normaloff>resource/image/enhence.png</normaloff>resource/image/enhence.png</iconset>
    </property>
    <property name="text">
-    <string>增强</string>
+    <string>增強</string>
    </property>
    <property name="toolTip">
-    <string>低光照增强</string>
+    <string>低光照增強</string>
    </property>
    <property name="font">
     <font>
@@ -295,7 +295,7 @@
   </action>
   <action name="copyAct">
    <property name="text">
-    <string>复制</string>
+    <string>複製</string>
    </property>
   </action>
   <action name="illuMapAct">
@@ -307,7 +307,7 @@
      <normaloff>resource/image/1211052.png</normaloff>resource/image/1211052.png</iconset>
    </property>
    <property name="text">
-    <string>光照图</string>
+    <string>光照圖</string>
    </property>
   </action>
   <action name="denoiseAct">
@@ -327,10 +327,10 @@
     <bool>true</bool>
    </property>
    <property name="text">
-    <string>工具栏</string>
+    <string>工具欄</string>
    </property>
    <property name="toolTip">
-    <string>工具栏</string>
+    <string>工具欄</string>
    </property>
   </action>
   <action name="showProgressBarAct">
@@ -338,7 +338,7 @@
     <bool>true</bool>
    </property>
    <property name="text">
-    <string>进度条</string>
+    <string>進度條</string>
    </property>
   </action>
   <action name="thankAct">
@@ -347,7 +347,7 @@
      <normaloff>resource/image/github.png</normaloff>resource/image/github.png</iconset>
    </property>
    <property name="text">
-    <string>致谢</string>
+    <string>致謝</string>
    </property>
   </action>
   <action name="saveAsAct">
@@ -359,7 +359,7 @@
      <normaloff>resource/image/save.png</normaloff>resource/image/save.png</iconset>
    </property>
    <property name="text">
-    <string>另存为</string>
+    <string>另存為</string>
    </property>
    <property name="font">
     <font>
@@ -376,7 +376,7 @@
      <normaloff>resource/image/save.png</normaloff>resource/image/save.png</iconset>
    </property>
    <property name="text">
-    <string>保存光照图</string>
+    <string>保存光照圖</string>
    </property>
   </action>
  </widget>
