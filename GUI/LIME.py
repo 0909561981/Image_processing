@@ -8,6 +8,7 @@ from PyQt5.QtCore import QObject, pyqtSignal
 from skimage.exposure import equalize_hist
 from skimage.exposure import rescale_intensity
 from skimage.color import rgb2gray
+from skimage.color import gray2rgb
 
 class LIME(QObject):
 
@@ -198,3 +199,19 @@ class LIME(QObject):
         r[mask_3] = 3 * i[mask_3] - (g[mask_3] + b[mask_3])
 
         return np.clip(cv2.merge([r, g, b]) * 255, 0, 255).astype(np.uint8)
+    
+    def GC_enhance(self):
+        gray_image = rgb2gray(self.L)
+        gamma = 0
+        for r in gray_image:
+            for c in r:
+                gamma += (c / (self.row * self.col))
+        gamma *= 2
+        enhanced_gray_image = gray_image ** gamma
+
+        self.R = np.zeros(self.L.shape)
+        for i in range(3):
+            nonzero_mask = gray_image != 0
+            self.R[:, :, i] = np.where(nonzero_mask, self.L[:, :, i] * enhanced_gray_image / np.where(nonzero_mask, gray_image, 1), self.L[:, :, i])
+        self.R = rescale_intensity(self.R, (0, 1))
+        return self.R
