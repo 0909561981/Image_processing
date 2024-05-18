@@ -134,7 +134,7 @@ class LIME(QObject):
         self.R = img_as_ubyte(self.R)
         return self.R
     # 這裡沒有用到self.t，不會被參數影響...
-    '''def HE_enhance(self):
+    def HE_enhance(self):
         gray_image = rgb2gray(self.L)
         enhanced_gray_image = equalize_hist(gray_image)
         self.R = np.zeros(self.L.shape)
@@ -144,9 +144,8 @@ class LIME(QObject):
         self.R = rescale_intensity(self.R, (0, 1))
         self.R = img_as_ubyte(self.R)
         return self.R
-    '''
 
-    def HE_enhance(self):
+    def HSI_enhance(self):
         hsi_image = self.rgb_to_hsi(self.L)
         hsi_image = img_as_float(hsi_image)
         hsi_image[:, :, 2] = equalize_hist(hsi_image[:, :, 2])
