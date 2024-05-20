@@ -215,3 +215,154 @@ class LIME(QObject):
             self.R[:, :, i] = np.where(nonzero_mask, self.L[:, :, i] * enhanced_gray_image / np.where(nonzero_mask, gray_image, 1), self.L[:, :, i])
         self.R = rescale_intensity(self.R, (0, 1))
         return self.R
+    
+    def CVC_enhance(self):
+        sq = 7
+        alpha = 0.33
+        beta = 0.33
+        gamma = 0.33
+        gray_image = rgb2gray(self.L)
+        gray_image = gray_image * 255
+        gray_image = gray_image.astype(int)
+        new_gray_image = [[0]*self.col for _ in range(self.row)]
+        xhis = self.Hx(image=gray_image, sq=sq)
+        uhis = self.Hu()
+        this = self.Ht(alpha=alpha, beta=beta, gamma=gamma, xhist=xhis, uhist=uhis)
+
+        Px = [-1 for _ in range(256)]
+        Pt = [-1 for _ in range(256)]
+        newGrayLevel = [0 for _ in range(256)]
+        for i in range( 256 ):
+            newGrayLevel[i] = self.grayLevel(m=i, xhist=xhis, thist=this, Px=Px, Pt=Pt)
+
+        for i in range( self.row ):
+            for j in range( self.col ):
+                original = gray_image[i][j]
+                new_gray_image[i][j] = newGrayLevel[original]
+                
+        self.R = np.zeros(self.L.shape)
+        for i in range(3):
+            nonzero_mask = gray_image != 0
+            self.R[:, :, i] = np.where(nonzero_mask, self.L[:, :, i] * new_gray_image / np.where(nonzero_mask, gray_image, 1), self.L[:, :, i])
+        self.R = rescale_intensity(self.R, (0, 1))
+        return self.R
+    
+    def hp(self, xm, xn):
+        ret = (abs(xm-xn)+1) / 256
+        return ret
+    
+    def Hx(self, image, sq):
+        hist = [[0]*256 for _ in range(256)]
+        for i in range( self.row ):
+            for j in range( self.col ):
+                for k in range( -int(sq/2), int(sq/2)+1 ):
+                    for q in range( -int(sq/2), int(sq/2)+1 ):
+                        if i+k >= 0 and i+k < self.row and j+q >= 0 and j+q < self.col:
+                            hist[image[i][j]][image[i+k][j+q]] += 1
+        total = 0
+        for i in range( 256 ):
+            for j in range( 256 ):
+                hist[i][j] *= self.hp(i, j)
+                total += hist[i][j]
+        for i in range( 256 ):
+            for j in range( 256 ):
+                hist[i][j] /= total
+        return hist
+    
+    def CDF(self, hist, m, saved):
+        ret = 0
+        if saved[m-1] != -1:
+            ret = saved[m-1]
+            for i in range( m ):
+                ret += hist[m-1][i]
+                ret += hist[i][m-1]
+            ret -= hist[m-1][m-1]
+        else:
+            for i in range( m ):
+                for j in range( m ):
+                    ret += hist[i][j]
+        return ret
+    
+    def Hu(self):
+        uniform = 1 / (256*256)
+        hist = [[uniform]*256 for _ in range(256)]
+        return hist
+    
+    def theta(self, k, r0, thetas):
+        if thetas[k-1] == -1:
+            thetas[k-1] = self.theta(k=k-1, r0=r0, thetas=thetas)
+        if thetas[k-2] == -1:
+            thetas[k-2] = self.theta(k=k-2, r0=r0, thetas=thetas)
+        if k < 257:
+            return (r0 * thetas[k-1] - thetas[k-2])
+        else:
+            return ((1+r0) * thetas[k-1] - thetas[k-2])
+    
+    def phi(self, k, r0, phis):
+        if phis[k+1] == -1:
+            phis[k+1] = self.phi(k=k+1, r0=r0, phis=phis)
+        if phis[k+2] == -1:
+            phis[k+2] = self.phi(k=k+2, r0=r0, phis=phis)
+        if k < 255:
+            return (r0 * phis[k+1] - phis[k+2])
+        else:
+            return ((1+r0) * phis[k+1] - phis[k+2])
+            
+    def S_mat(self, alpha, beta, gamma):
+        mat = [[0]*256 for _ in range(256)]
+        r0 = (2*gamma + alpha + beta) / (-gamma)
+        thetas = [-1 for _ in range(258)]
+        thetas[0] = 0
+        thetas[1] = 1
+        for i in range( 256 ):
+            if thetas[i+2] == -1:
+                thetas[i+2] = self.theta(k=i+2, r0=r0, thetas=thetas)
+        phis = [-1 for _ in range(258)]
+        phis[256] = 1
+        phis[257] = 0
+        for i in range( 256 ):
+            if phis[255-i] == -1:
+                phis[255-i] = self.phi(k=255-i, r0=r0, phis=phis)
+        for i in range( 256 ):
+            for j in range( 256 ):
+                if i < j:
+                    mat[i][j] = ((-1)**(i+j) / (-gamma)) * (thetas[i+1]*phis[j+1] / thetas[257])
+                elif i == j:
+                    mat[i][j] = (1 / (-gamma)) * (thetas[i+1]*phis[i+1] / thetas[257])
+                else:
+                    mat[i][j] = ((-1)**(i+j) / (-gamma)) * (thetas[j+1]*phis[i+1] / thetas[257])
+        return mat
+    
+    def Ht(self, alpha, beta, gamma, xhist, uhist):
+        Smat = self.S_mat(alpha=alpha, beta=beta, gamma=gamma)
+        hist = [[0] * 256 for _ in range(256)]
+        for i in range( 256 ):
+            for j in range( 256 ):
+                hist[i][j] = alpha * xhist[i][j] + beta * uhist[i][j]
+        thist = [[0]*256 for _ in range(256)]
+        total = 0
+        for i in range( 256 ):
+            for j in range( 256 ):
+                for k in range( 256 ):
+                    thist[i][j] += (Smat[i][k] * hist[k][j])
+                total += thist[i][j]
+        for i in range( 256 ):
+            for j in range( 256 ):
+                thist[i][j] /= total
+        return thist
+    
+    def grayLevel(self, m, xhist, thist, Px, Pt):
+        if Px[m] == -1:
+            Px[m] = self.CDF(hist=xhist, m=m, saved=Px)
+        if Pt[0] == -1:
+            Pt[0] = self.CDF(hist=thist, m=0, saved=Pt)
+        min = abs(Px[m] - Pt[0])
+        mini = 0
+        for i in range( 1, 256 ):
+            if Pt[i] == -1:
+                Pt[i] = self.CDF(hist=thist, m=i, saved=Pt)
+            temp = abs(Px[m] - Pt[i])
+            if temp < min:
+                min = temp
+                mini = i
+        return mini
