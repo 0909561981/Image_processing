@@ -129,17 +129,6 @@ class Ui_MainWindow(object):
         font.setPointSize(8)
         self.HSIAction.setFont(font)
         self.HSIAction.setObjectName("HSIAction")
-        '''self.HEAction = QtWidgets.QAction(MainWindow)
-        self.HEAction.setCheckable(False)  
-        self.HEAction.setEnabled(False)
-        icon = QtGui.QIcon()
-        icon.addPixmap(QtGui.QPixmap("resource/image/enhence.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
-        self.HEAction.setIcon(icon)
-        font = QtGui.QFont()
-        font.setPointSize(8)
-        self.HEAction.setFont(font)
-        self.HEAction.setObjectName("HEAction")'''
-
         self.GCAction = QtWidgets.QAction(MainWindow)
         self.GCAction.setCheckable(False)  
         self.GCAction.setEnabled(False)
@@ -150,7 +139,6 @@ class Ui_MainWindow(object):
         font.setPointSize(8)
         self.GCAction.setFont(font)
         self.GCAction.setObjectName("GCAction")
-
         self.saveAct = QtWidgets.QAction(MainWindow)
         self.saveAct.setEnabled(False)
         icon7 = QtGui.QIcon()

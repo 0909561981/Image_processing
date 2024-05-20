@@ -110,6 +110,7 @@ class Window(QMainWindow, Ui_MainWindow):
         self.workThread.start()
         self.workThread.finishSignal.connect(self.on_workThread_finishSignal)
 
+    @pyqtSlot()
     def on_HEAction_triggered(self):
         self.progressBar.setValue(0)
         # self.progressBar.setVisible(True)
@@ -118,6 +119,7 @@ class Window(QMainWindow, Ui_MainWindow):
         self.HE.start()
         self.HE.finishSignal.connect(self.on_HE_finishSignal)
 
+    @pyqtSlot()
     def on_HSIAction_triggered(self):
         self.progressBar.setValue(0)
         # self.progressBar.setVisible(True)
@@ -126,6 +128,7 @@ class Window(QMainWindow, Ui_MainWindow):
         self.HSI.start()
         self.HSI.finishSignal.connect(self.on_HSI_finishSignal)
 
+    @pyqtSlot()
     def on_GCAction_triggered(self):
         self.progressBar.setValue(0)
         # self.progressBar.setVisible(True)
